@@ -38,9 +38,9 @@ module.exports = (async (req, res) => {
             opening.recurrenceId = recurrenceId
         }
 
-        const id = Firebase.openings_store.doc()
-        batch.set(id, opening)
-        opening.id = id
+        const ref = Firebase.openings_store.doc()
+        batch.set(ref, opening)
+        opening.id = ref.id
         openings.push(opening)
     }
 
