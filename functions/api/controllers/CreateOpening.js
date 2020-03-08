@@ -27,6 +27,7 @@ module.exports = (async (req, res) => {
     const occurrences = recurrence ? recurrence.numberOfOccurrences : 1
     const recurrenceId = uuid.v4()
     const openings = []
+    const batch = Firebase.db.batch()
 
     for (i = 0; i < occurrences; i++) {
         const durationUnit = recurrenceTypeToDurationUnit(recurrence ? recurrence.type : "")
@@ -37,11 +38,13 @@ module.exports = (async (req, res) => {
             opening.recurrenceId = recurrenceId
         }
 
-        // todo: use batching to avoid doing multiple writes
-        const ref = await Firebase.openings_store.add(opening)
-        opening["id"] = ref.id
+        const id = Firebase.openings_store.doc()
+        batch.set(id, opening)
+        opening.id = id
         openings.push(opening)
     }
+
+    await batch.commit()
 
     res.status(201).send(openings)
 })
