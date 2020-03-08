@@ -14,7 +14,7 @@ const getAllOpeningsController = require("./controllers/GetAllOpenings")
 const auth = require("./services/auth");
 
 module.exports = (app) => {
-    app.use(auth);
+    // app.use(auth);
 
     app.route("/firing")
         .post(createFiringController)

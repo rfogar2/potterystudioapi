@@ -9,7 +9,7 @@ module.exports = (async (_req, res) => {
             opening["id"] = doc.id
             return opening
         })
-        .sort((a, b) => moment(b.start) - moment(a.start))
+        .sort((a, b) => moment(a.start) - moment(b.start))
 
     res.status(200).send(openings)
 })
