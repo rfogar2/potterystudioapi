@@ -30,9 +30,9 @@ module.exports = (async (req, res) => {
 
     for (i = 0; i < occurrences; i++) {
         const durationUnit = recurrenceTypeToDurationUnit(recurrence ? recurrence.type : "")
-        const openingStart = moment(start).add(i, durationUnit)
+        const openingStart = moment(start).add(i, durationUnit).toISOString()
 
-        const opening = { openingStart, lengthSeconds, size }
+        const opening = { start: openingStart, lengthSeconds, size, reservedUsers: [] }
         if (occurrences > 1) {
             opening.recurrenceId = recurrenceId
         }
