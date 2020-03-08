@@ -10,14 +10,14 @@ module.exports = (async (req, res) => {
         opening.bookedUsers = []
     }
 
-    const userAlreadyBooked = opening.bookedUsers.includes(userId)
+    const userNotBooked = !opening.bookedUsers.includes(userId)
     
-    if (opening.bookedUsers.length >= opening.size && !userAlreadyBooked) {
+    if (opening.bookedUsers.length >= opening.size && userNotBooked) {
         res.status(400).send("Opening is fully booked")
         return
     }
 
-    if (!userAlreadyBooked) {
+    if (userNotBooked) {
         opening.bookedUsers.push(userId)
         await Firebase.openings_store.doc(openingId).update(opening)
     }
