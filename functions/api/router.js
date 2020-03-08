@@ -2,6 +2,8 @@ const createFiringController = require("./controllers/CreateFiring")
 const deleteFiringController = require("./controllers/DeleteFiring")
 const getAllFiringsController = require("./controllers/GetAllFirings")
 const updateFiringController = require("./controllers/UpdateFiring")
+const createOpeningController = require("./controllers/CreateOpening")
+const reserveOpeningController = require("./controllers/ReserveOpening")
 // const auth = require('../../api/Services/auth');
 
 module.exports = (app) => {
@@ -14,6 +16,12 @@ module.exports = (app) => {
 
     app.route("/firing/:id")
         .delete(deleteFiringController)
+
+    app.route("/opening")
+        .post(createOpeningController)
+
+    app.route("/opening/:openingId/reserve/:userId")
+        .put(reserveOpeningController)
 
     // app.route('/debate')
     //     .post(controller.create_debate)
