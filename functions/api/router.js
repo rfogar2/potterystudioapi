@@ -1,5 +1,7 @@
 const createFiringController = require("./controllers/CreateFiring")
 const deleteFiringController = require("./controllers/DeleteFiring")
+const getAllFiringsController = require("./controllers/GetAllFirings")
+const updateFiringController = require("./controllers/UpdateFiring")
 // const auth = require('../../api/Services/auth');
 
 module.exports = (app) => {
@@ -7,6 +9,8 @@ module.exports = (app) => {
 
     app.route("/firing")
         .post(createFiringController)
+        .get(getAllFiringsController)
+        .put(updateFiringController)
 
     app.route("/firing/:id")
         .delete(deleteFiringController)
