@@ -1,6 +1,6 @@
 const firebase = require("./firebase");
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
     function forbid() {
         res.status(401).send("Nahhh looks sketchy"); 
         return res.end();

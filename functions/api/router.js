@@ -11,8 +11,15 @@ const getReservationsForUserController = require("./controllers/GetReservationsF
 const updateOpeningController = require("./controllers/UpdateOpening")
 const deleteOpeningController = require("./controllers/DeleteOpening")
 const getAllOpeningsController = require("./controllers/GetAllOpenings")
+const usersController = require("./controllers/UsersController")
 
 module.exports = (app) => {
+
+    app.route("/user/valid")
+        .get(usersController.validUser)
+
+    app.route("/user")
+        .post(usersController.createUser)
 
     app.route("/firing")
         .post(createFiringController)
