@@ -11,10 +11,8 @@ const getReservationsForUserController = require("./controllers/GetReservationsF
 const updateOpeningController = require("./controllers/UpdateOpening")
 const deleteOpeningController = require("./controllers/DeleteOpening")
 const getAllOpeningsController = require("./controllers/GetAllOpenings")
-const auth = require("./services/auth");
 
 module.exports = (app) => {
-    // app.use(auth);
 
     app.route("/firing")
         .post(createFiringController)
