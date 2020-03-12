@@ -1,4 +1,4 @@
-const firebase = require("./firebase");
+const Firebase = require("./firebase");
 
 module.exports = async (req, res, next) => {
     function forbid() {
@@ -12,7 +12,13 @@ module.exports = async (req, res, next) => {
     }
 
     try {
-        var decodedToken = await firebase.admin.auth().verifyIdToken(idToken);
+        var decodedToken = await Firebase.admin.auth().verifyIdToken(idToken);
+        var user = await Firebase.users_store.doc(decodedToken).get();
+
+        if (!user.isValid) {
+            return forbid();
+        }
+
         req.user = decodedToken;
         return next();
     } catch (e) {
