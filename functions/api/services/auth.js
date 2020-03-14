@@ -2,26 +2,21 @@ const Firebase = require("./firebase");
 
 module.exports = async (req, res, next) => {
     function forbid() {
-        res.status(401).send("Nahhh looks sketchy"); 
-        return res.end();
+        return res.status(401).send("Unauthorized")
     }
 
-    const idToken = req.header("Authorization");
+    const idToken = req.header("Authorization")
     if (!idToken) {
-        return forbid();
+        return forbid()
     }
 
     try {
-        var decodedToken = await Firebase.admin.auth().verifyIdToken(idToken);
-        var user = await Firebase.users_store.doc(decodedToken).get();
+        var decodedToken = await Firebase.admin.auth().verifyIdToken(idToken)
 
-        if (!user.isValid) {
-            return forbid();
-        }
-
-        req.user = decodedToken;
-        return next();
+        req.userId = decodedToken
+        return next()
     } catch (e) {
-        return forbid();
+        console.log(e);
+        return forbid()
     }
 }

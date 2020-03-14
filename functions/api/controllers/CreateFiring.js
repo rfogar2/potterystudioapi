@@ -10,9 +10,15 @@ module.exports = (async (req, res) => {
         return
     }
 
-    const firing = { start, durationSeconds, cooldownSeconds, type: type.toUpperCase() }
-    const ref = await Firebase.firings_store.add(firing)
-    firing["id"] = ref.id
+    const id = Firebase.firings_store.doc().id
+    const firing = {
+        start,
+        durationSeconds,
+        cooldownSeconds,
+        type: type.toUpperCase(),
+        id
+    }
+    const ref = await Firebase.firings_store.doc(id).set(firing);
 
     res.status(201).send(firing)
 })

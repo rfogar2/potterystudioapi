@@ -33,14 +33,17 @@ module.exports = (async (req, res) => {
         const durationUnit = recurrenceTypeToDurationUnit(recurrence ? recurrence.type : "")
         const openingStart = moment(start).add(i, durationUnit).toISOString()
 
-        const opening = { start: openingStart, lengthSeconds, size, reservedUsers: [] }
-        if (occurrences > 1) {
-            opening.recurrenceId = recurrenceId
+        const ref = Firebase.openings_store.doc()
+        const opening = {
+            start: openingStart,
+            lengthSeconds,
+            size, 
+            reservedUsers: [],
+            id: ref.id,
+            recurrenceId: occurrences > 1 ? recurrenceId : null
         }
 
-        const ref = Firebase.openings_store.doc()
         batch.set(ref, opening)
-        opening.id = ref.id
         openings.push(opening)
     }
 

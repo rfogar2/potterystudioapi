@@ -1,13 +1,9 @@
 const Firebase = require("../services/firebase")
 
 exports.validUser = (async (req, res) => {
-    const snapshot = await Firebase.users_store.doc(req.user).get();
-    const user = snapshot.data()
+    const user = req.user; // set by auth.js
 
-    return res
-        .status(user && user.isValid ? 200 : 403)
-        .send()
-        .end();
+    return res.status(user ? 200 : 403).send()
 })
 
 exports.createUser = (async (req, res) => {
@@ -17,9 +13,12 @@ exports.createUser = (async (req, res) => {
     const snapshot = await Firebase.company_store.where("companySecret", "==", companySecret).get()
 
     if (snapshot.size === 1) {
-        const user = { companyId: snapshot.docs[0].id, userId: req.user, valid: true }
+        const user = {
+            companyId: snapshot.docs[0].id,
+            id: req.userId
+        }
 
-        await Firebase.users_store.add(user);
+        await Firebase.users_store.doc(req.user).set(user);
         return res.status(201).send(user).end();
     } else {
         return res.status(403).send().end();
