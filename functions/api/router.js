@@ -1,17 +1,8 @@
-const createFiringController = require("./controllers/CreateFiring")
-const deleteFiringController = require("./controllers/DeleteFiring")
-const getAllFiringsController = require("./controllers/GetAllFirings")
-const updateFiringController = require("./controllers/UpdateFiring")
-const createOpeningController = require("./controllers/CreateOpening")
-const reserveOpeningController = require("./controllers/ReserveOpening")
-const removeReservationController = require("./controllers/RemoveReservation")
-const getRecurrenceController = require("./controllers/GetRecurrence")
-const deleteRecurrenceController = require("./controllers/DeleteRecurrence")
-const getReservationsForUserController = require("./controllers/GetReservationsForUser")
-const updateOpeningController = require("./controllers/UpdateOpening")
-const deleteOpeningController = require("./controllers/DeleteOpening")
-const getAllOpeningsController = require("./controllers/GetAllOpenings")
 const usersController = require("./controllers/UsersController")
+const firingController = require("./controllers/FiringController")
+const openingController = require("./controllers/OpeningController")
+const recurrenceController = require("./controllers/RecurrenceController")
+const reservationController = require("./controllers/ReservationController")
 
 module.exports = (app) => {
 
@@ -22,29 +13,29 @@ module.exports = (app) => {
         .post(usersController.createUser)
 
     app.route("/firing")
-        .post(createFiringController)
-        .get(getAllFiringsController)
-        .put(updateFiringController)
+        .post(firingController.createFiring)
+        .get(firingController.getAllFirings)
+        .put(firingController.updateFiring)
 
     app.route("/firing/:firingId")
-        .delete(deleteFiringController)
+        .delete(firingController.deleteFiring)
 
     app.route("/opening")
-        .post(createOpeningController)
-        .put(updateOpeningController)
-        .get(getAllOpeningsController)
+        .post(openingController.createOpening)
+        .put(openingController.updateOpening)
+        .get(openingController.getAllOpenings)
 
     app.route("/opening/:openingId")
-        .delete(deleteOpeningController)
-
-    app.route("/opening/:openingId/reserve/:userId")
-        .put(reserveOpeningController)
-        .delete(removeReservationController)
-
+        .delete(openingController.deleteOpening)
+        
     app.route("/opening/recurrence/:recurrenceId")
-        .get(getRecurrenceController)
-        .delete(deleteRecurrenceController)
+        .get(recurrenceController.getRecurrence)
+        .delete(recurrenceController.deleteRecurrence)
+        
+    app.route("/opening/:openingId/reserve")
+        .put(reservationController.reserveOpening)
+        .delete(reservationController.removeReservation)
 
-    app.route("/opening/reservation/user/:userId")
-        .get(getReservationsForUserController)
+    app.route("/opening/reservation/user")
+        .get(reservationController.getReservationsForUser)
 }
