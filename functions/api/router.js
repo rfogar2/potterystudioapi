@@ -1,4 +1,4 @@
-const usersController = require("./controllers/UsersController")
+const userController = require("./controllers/UserController")
 const firingController = require("./controllers/FiringController")
 const openingController = require("./controllers/OpeningController")
 const recurrenceController = require("./controllers/RecurrenceController")
@@ -7,10 +7,11 @@ const reservationController = require("./controllers/ReservationController")
 module.exports = (app) => {
 
     app.route("/user/valid")
-        .get(usersController.validUser)
+        .get(userController.validUser)
 
     app.route("/user")
-        .post(usersController.createUser)
+        .post(userController.createUser)
+        .get(userController.getUser)
 
     app.route("/firing")
         .post(firingController.createFiring)
