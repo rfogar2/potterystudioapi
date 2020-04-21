@@ -28,6 +28,7 @@ module.exports = (app) => {
 
     app.route("/opening/:openingId")
         .delete(openingController.deleteOpening)
+        .get(openingController.getOpening)
         
     app.route("/opening/recurrence/:recurrenceId")
         .get(recurrenceController.getRecurrence)

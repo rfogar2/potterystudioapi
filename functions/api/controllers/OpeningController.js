@@ -41,7 +41,7 @@ exports.createOpening = (async (req, res) => {
             start: openingStart,
             lengthSeconds,
             size, 
-            reservedUsers: [],
+            reservedUserIds: [],
             id: ref.id,
             recurrenceId: occurrences > 1 ? recurrenceId : null
         }
@@ -107,12 +107,29 @@ exports.updateOpening = (async (req, res) => {
 exports.getAllOpenings = (async (_req, res) => {
     const snapshot = await Firebase.openings_store.get()
     const openings = snapshot.docs
-        .map((doc) => {
-            const opening = doc.data()
-            opening["id"] = doc.id
-            return opening
-        })
+        .map((doc) => doc.data())
         .sort((a, b) => moment(a.start) - moment(b.start))
 
     return res.status(200).send(openings)
+})
+
+exports.getOpening = (async (req, res) => {
+    const { openingId } = req.params
+
+    const doc = await Firebase.openings_store.doc(openingId).get()
+    const opening = doc.data()
+
+    if (req.isAdmin) {
+        const usersSnapshot = await Firebase.users_store.get()
+        const reservedUsers = usersSnapshot.docs
+            .map((doc) => doc.data())
+            .filter((reservedUser) => opening.reservedUserIds.includes(reservedUser.id))
+            .sort((a, b) => a.name - b.name)
+
+        opening["reservedUsers"] = reservedUsers
+    } else {
+        opening["reservedUsers"] = []
+    }
+
+    return res.status(200).send(opening)
 })

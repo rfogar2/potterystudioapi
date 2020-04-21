@@ -9,7 +9,7 @@ exports.getReservationsForUser = (async (req, res) => {
             opening.id = doc.id
             return opening
         })
-        .filter((opening) => opening.reservedUsers.includes(req.userId))
+        .filter((opening) => opening.reservedUserIds.includes(req.userId))
         .sort((a, b) => moment(a.start) - moment(b.start))
 
     return res.status(200).send(openings)
@@ -25,7 +25,7 @@ exports.removeReservation = (async (req, res) => {
         return res.status(400).send("Opening does not exist")
     }
 
-    opening.reservedUsers = opening.reservedUsers.filter((userId) => userId !== req.userId)
+    opening.reservedUserIds = opening.reservedUserIds.filter((userId) => userId !== req.userId)
     await Firebase.openings_store.doc(openingId).update(opening)
 
     opening.id = openingId
@@ -38,18 +38,14 @@ exports.reserveOpening = (async (req, res) => {
     const openingSnapshot = await Firebase.openings_store.doc(openingId).get()
     const opening = openingSnapshot.data()
     
-    if (!opening.reservedUsers) {
-        opening.reservedUsers = []
-    }
-
-    const userNotBooked = !opening.reservedUsers.includes(req.userId)
+    const userNotBooked = !opening.reservedUserIds.includes(req.userId)
     
-    if (opening.reservedUsers.length >= opening.size && userNotBooked) {
+    if (opening.reservedUserIds.length >= opening.size && userNotBooked) {
         return res.status(400).send("Opening is fully booked")
     }
 
     if (userNotBooked) {
-        opening.reservedUsers.push(req.userId)
+        opening.reservedUserIds.push(req.userId)
         await Firebase.openings_store.doc(openingId).update(opening)
     }
     opening.id = openingId

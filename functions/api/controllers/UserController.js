@@ -6,9 +6,9 @@ exports.validUser = (async (req, res) => {
 
 exports.createUser = (async (req, res) => {
     // todo: encrypt/decrypt companySecret
-    const { companyName, companySecret } = req.query
+    const { name, companyName, companySecret } = req.query
 
-    if (!companyName || !companySecret) {
+    if (!companyName || !companySecret || !name) {
         return res.status(400).send().end()
     }
 
@@ -20,6 +20,7 @@ exports.createUser = (async (req, res) => {
         }
 
         const user = {
+            name: name,
             companyId: company.id,
             id: req.userId
         }
