@@ -44,3 +44,11 @@ exports.getUser = (async (req, res) => {
 
     return res.status(200).send(user).end()
 })
+
+exports.deleteUser = (async (req, res) => {
+    const { user } = req;
+
+    await Firebase.users_store.doc(user.id).delete()
+
+    return res.status(204).send()
+})

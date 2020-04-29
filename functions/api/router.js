@@ -12,6 +12,7 @@ module.exports = (app) => {
     app.route("/user")
         .post(userController.createUser)
         .get(userController.getUser)
+        .delete(userController.deleteUser)
 
     app.route("/firing")
         .post(firingController.createFiring)
