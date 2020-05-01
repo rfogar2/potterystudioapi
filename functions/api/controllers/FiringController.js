@@ -74,3 +74,12 @@ exports.deleteFiring = (async (req, res) => {
 
     return res.status(204).send()
 })
+
+exports.getFiring = (async (req, res) => {
+    const { firingId } = req.params
+
+    const doc = await Firebase.firings_store.doc(firingId).get()
+    const firing = doc.data()
+
+    return res.status(200).send(firing)
+})

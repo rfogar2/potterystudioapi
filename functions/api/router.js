@@ -21,6 +21,7 @@ module.exports = (app) => {
 
     app.route("/firing/:firingId")
         .delete(firingController.deleteFiring)
+        .get(firingController.getFiring)
 
     app.route("/opening")
         .post(openingController.createOpening)

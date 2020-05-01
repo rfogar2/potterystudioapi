@@ -1,21 +1,28 @@
 const Firebase = require("../services/firebase")
+const functions = require("firebase-functions")
+const NodeRSA = require('node-rsa')
 
 exports.validUser = (async (req, res) => {
     return res.status(req.user ? 200 : 403).send()
 })
 
 exports.createUser = (async (req, res) => {
-    // todo: encrypt/decrypt companySecret
-    const { name, companyName, companySecret } = req.query
+    const { name, companyName, companySecret } = req.body
 
     if (!companyName || !companySecret || !name) {
         return res.status(400).send().end()
     }
 
+    const privateKey = functions.config().keys.privatekey
+
+    const key = new NodeRSA(Buffer.from(privateKey))
+    key.setOptions({encryptionScheme: "pkcs1"})
+    const decryptedCompanySecret = key.decrypt(companySecret, "utf8")
+
     const snapshot = await Firebase.company_store.where("companyName", "==", companyName).get()
     if (snapshot.size === 1) {
         var company = snapshot.docs[0].data()
-        if (company.companySecret !== companySecret) {
+        if (company.companySecret !== decryptedCompanySecret) {
             return res.status(400).send().end()
         }
 
