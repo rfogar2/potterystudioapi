@@ -9,7 +9,7 @@ const uuid = require("uuid")
     lengthSeconds: Int,
     size: Int,
     recurrence?: {
-        type: only "WEEKLY" currently supported,
+        type: one of ["WEEKLY", "DAILY", "MONTHLY"],
         numberOfRecurrences: Int
     }
 }

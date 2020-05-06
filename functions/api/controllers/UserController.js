@@ -55,6 +55,8 @@ exports.getUser = (async (req, res) => {
 exports.deleteUser = (async (req, res) => {
     const { user } = req;
 
+    // todo: remove user from all opening reservations
+
     await Firebase.users_store.doc(user.id).delete()
 
     return res.status(204).send()
