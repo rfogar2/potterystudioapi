@@ -104,10 +104,18 @@ exports.updateOpening = (async (req, res) => {
     return res.status(200).send(opening)
 })
 
-exports.getAllOpenings = (async (_req, res) => {
+exports.getAllOpenings = (async (req, res) => {
+    const { includePast } = req.query;
+
     const snapshot = await Firebase.openings_store.get()
     const openings = snapshot.docs
         .map((doc) => doc.data())
+        .filter((opening) => {
+            return includePast === "true" || 
+                moment(opening.start)
+                    .add(opening.lengthSeconds, "seconds")
+                    .isAfter(moment())
+        })
         .sort((a, b) => moment(a.start) - moment(b.start))
 
     return res.status(200).send(openings)

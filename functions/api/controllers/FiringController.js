@@ -35,7 +35,7 @@ exports.getAllFirings = (async (_req, res) => {
             firing["id"] = doc.id
             return firing
         })
-        .sort((a, b) => moment(b.start) - moment(a.start))
+        .sort((a, b) => moment(a.start) - moment(b.start))
 
     return res.status(200).send(firings)
 })
