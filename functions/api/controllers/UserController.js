@@ -80,11 +80,7 @@ exports.registerAsAdmin = (async (req, res) => {
         return res.status(200).send()
     }
 
-    if (adminCode === null) {
-        return res.status(400).send().end()
-    }
-
-    const studioSnapshot = await Firebase.studio.doc(user.studioId).get()
+    const studioSnapshot = await Firebase.studio_store.doc(user.studioId).get()
     const studio = studioSnapshot.data()
 
     if (studio.adminCode === adminCode) {
@@ -93,6 +89,6 @@ exports.registerAsAdmin = (async (req, res) => {
 
         return res.status(200).send()
     } else {
-        return res.status(401).send()
+        return res.status(400).send()
     }
 })
