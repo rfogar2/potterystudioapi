@@ -7,34 +7,25 @@ exports.validUser = (async (req, res) => {
 })
 
 exports.createUser = (async (req, res) => {
-    const { name, companyName, companySecret } = req.body
+    const { name, studioCode } = req.body
 
-    if (!companyName || !companySecret || !name) {
+    if (!studioCode || !name) {
         return res.status(400).send().end()
     }
 
-    const privateKey = functions.config().keys.privatekey
-
-    const key = new NodeRSA(Buffer.from(privateKey))
-    key.setOptions({encryptionScheme: "pkcs1"})
-    const decryptedCompanySecret = key.decrypt(companySecret, "utf8")
-
-    const snapshot = await Firebase.company_store.where("companyName", "==", companyName).get()
+    const snapshot = await Firebase.studio_store.where("code", "==", studioCode).get()
     if (snapshot.size === 1) {
-        var company = snapshot.docs[0].data()
-        if (company.companySecret !== decryptedCompanySecret) {
-            return res.status(400).send().end()
-        }
+        var studio = snapshot.docs[0].data()
 
         const user = {
             name: name,
-            companyId: company.id,
+            studioId: studio.id,
             id: req.userId
         }
         
         await Firebase.users_store.doc(req.userId).set(user)
         
-        user.companyName = companyName;
+        user.studioName = studio.name;
         return res.status(201).send(user).end()
     } else {
         return res.status(403).send().end()
@@ -44,10 +35,10 @@ exports.createUser = (async (req, res) => {
 exports.getUser = (async (req, res) => {
     const { user } = req;
 
-    const companySnapshot = await Firebase.company_store.doc(user.companyId).get()
-    const company = companySnapshot.data()
+    const studioSnapshot = await Firebase.studio_store.doc(user.studioId).get()
+    const studio = studioSnapshot.data()
 
-    user.companyName = company.companyName;
+    user.studioName = studio.name;
 
     return res.status(200).send(user).end()
 })
@@ -60,4 +51,37 @@ exports.deleteUser = (async (req, res) => {
     await Firebase.users_store.doc(user.id).delete()
 
     return res.status(204).send()
+})
+
+decryptSecret = (encrypted) => {
+    const privateKey = functions.config().keys.privatekey
+
+    const key = new NodeRSA(Buffer.from(privateKey))
+    key.setOptions({encryptionScheme: "pkcs1"})
+    return key.decrypt(encrypted, "utf8");
+}
+
+exports.registerAsAdmin = (async (req, res) => {
+    const { user } = req;
+    const { adminCode } = req.body
+
+    if (user.isAdmin === true) {
+        return res.status(200).send()
+    }
+
+    if (adminCode === null) {
+        return res.status(400).send().end()
+    }
+
+    const studioSnapshot = await Firebase.studio.doc(user.studioId).get()
+    const studio = studioSnapshot.data()
+
+    if (studio.adminCode === adminCode) {
+        user.isAdmin = true;
+        await Firebase.users_store.doc(user.id).set(user)
+
+        return res.status(200).send()
+    } else {
+        return res.status(401).send()
+    }
 })

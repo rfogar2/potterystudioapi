@@ -20,6 +20,7 @@ exports.createFiring = (async (req, res) => {
         durationSeconds,
         cooldownSeconds,
         type: type.toUpperCase(),
+        studioId: req.user.studioId,
         id
     }
     await Firebase.firings_store.doc(id).set(firing);
@@ -27,13 +28,17 @@ exports.createFiring = (async (req, res) => {
     return res.status(201).send(firing)
 })
 
-exports.getAllFirings = (async (_req, res) => {
-    const snapshot = await Firebase.firings_store.get()
+exports.getAllFirings = (async (req, res) => {
+    const { includePast } = req.query;
+
+    const snapshot = await Firebase.firings_store.where("studioId", "==", req.user.studioId).get()
     const firings = snapshot.docs
-        .map((doc) => {
-            const firing = doc.data()
-            firing["id"] = doc.id
-            return firing
+        .map((doc) => doc.data())
+        .filter((firing) => {
+            return includePast === "true" || 
+                moment(firing.start)
+                    .add(firing.durationSeconds + firing.cooldownSeconds, "seconds")
+                    .isAfter(moment())
         })
         .sort((a, b) => moment(a.start) - moment(b.start))
 
@@ -58,19 +63,34 @@ exports.updateFiring = (async (req, res) => {
         return res.status(400).send("Firing does not exist")
     }
 
-    const firing = { start, durationSeconds, cooldownSeconds, type: type.toUpperCase() }
+    const firing = snapshot.data()
+
+    if (firing.studioId !== req.user.studioId) {
+        return res.status(403).send()
+    }
+
+    firing.start = start
+    firing.durationSeconds = durationSeconds
+    firing.cooldownSeconds = cooldownSeconds,
+    firing.type = type.toUpperCase()
+
     await Firebase.firings_store.doc(id).update(firing)
-    firing["id"] = snapshot.id
 
     return res.status(200).send(firing)
 })
 
 exports.deleteFiring = (async (req, res) => {
+    const { firingId } = req.params
+    
     if (!req.isAdmin) {
         return res.status(403).send("Forbidden")
     }
 
-    const { firingId } = req.params
+    const snapshot = await Firebase.firings_store.doc(firingId).get()
+    if (snapshot.data().studioId !== req.user.studioId) {
+        return res.status(403).send()
+    }
+
     await Firebase.firings_store.doc(firingId).delete()
 
     return res.status(204).send()
@@ -81,6 +101,10 @@ exports.getFiring = (async (req, res) => {
 
     const doc = await Firebase.firings_store.doc(firingId).get()
     const firing = doc.data()
+
+    if (firing.studioId !== req.user.studioId) {
+        return res.status(403).send()
+    }
 
     return res.status(200).send(firing)
 })

@@ -43,6 +43,7 @@ exports.createOpening = (async (req, res) => {
             size, 
             reservedUserIds: [],
             id: ref.id,
+            studioId: req.user.studioId,
             recurrenceId: occurrences > 1 ? recurrenceId : null
         }
 
@@ -66,11 +67,17 @@ recurrenceTypeToDurationUnit = (type) => {
 }
 
 exports.deleteOpening = (async (req, res) => {
+    const { openingId } = req.params
+    
     if (!req.isAdmin) {
         return res.status(403).send("Forbidden")
     }
 
-    const { openingId } = req.params
+    const snapshot = await Firebase.openings_store.doc(openingId).get()
+    if (snapshot.data().studioId !== req.user.studioId) {
+        return res.status(403).send()
+    }
+
     await Firebase.openings_store.doc(openingId).delete()
 
     return res.status(204).send()
@@ -95,11 +102,15 @@ exports.updateOpening = (async (req, res) => {
     }
 
     const opening = snapshot.data()
+
+    if (opening.studioId !== req.user.studioId) {
+        return res.status(403).send()
+    }
+
     opening.start = start
     opening.lengthSeconds = lengthSeconds
     opening.size = size
     await Firebase.openings_store.doc(id).update(opening)
-    opening.id = id
 
     return res.status(200).send(opening)
 })
@@ -107,7 +118,7 @@ exports.updateOpening = (async (req, res) => {
 exports.getAllOpenings = (async (req, res) => {
     const { includePast } = req.query;
 
-    const snapshot = await Firebase.openings_store.get()
+    const snapshot = await Firebase.openings_store.where("studioId", "==", req.user.studioId).get()
     const openings = snapshot.docs
         .map((doc) => doc.data())
         .filter((opening) => {
@@ -126,6 +137,10 @@ exports.getOpening = (async (req, res) => {
 
     const doc = await Firebase.openings_store.doc(openingId).get()
     const opening = doc.data()
+
+    if (opening.studioId !== req.user.studioId) {
+        return res.status(403).send()
+    }
 
     if (req.isAdmin) {
         const usersSnapshot = await Firebase.users_store.get()

@@ -14,6 +14,9 @@ module.exports = (app) => {
         .get(userController.getUser)
         .delete(userController.deleteUser)
 
+    app.route("/user/admin")
+        .put(userController.registerAsAdmin)
+
     app.route("/firing")
         .post(firingController.createFiring)
         .get(firingController.getAllFirings)
