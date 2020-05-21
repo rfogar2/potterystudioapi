@@ -46,8 +46,19 @@ exports.getUser = (async (req, res) => {
 exports.deleteUser = (async (req, res) => {
     const { user } = req;
 
-    // todo: remove user from all opening reservations
+    const snapshot = await Firebase.openings_store.where("studioId", "==", user.studioId).get()
+    const openings = snapshot.docs.map((doc) => doc.data())
 
+    const batch = Firebase.db.batch()
+
+    for (var i = 0; i < openings.length; i++) {
+        var opening = openings[i]
+        opening.reservedUserIds = opening.reservedUserIds.filter((id) => id !== user.id)
+
+        batch.set(Firebase.openings_store.doc(opening.id), opening)
+    }
+
+    await batch.commit()
     await Firebase.users_store.doc(user.id).delete()
 
     return res.status(204).send()
