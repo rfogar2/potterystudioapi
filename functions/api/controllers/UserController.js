@@ -6,7 +6,7 @@ exports.validUser = (async (req, res) => {
     return res.status(req.user ? 200 : 403).send()
 })
 
-exports.createUser = (async (req, res) => {
+exports.createUser = async (req, res) => {
     const { name, studioCode } = req.body
 
     if (!studioCode || !name) {
@@ -30,7 +30,7 @@ exports.createUser = (async (req, res) => {
     } else {
         return res.status(403).send().end()
     }
-})
+}
 
 exports.getUser = (async (req, res) => {
     const { user } = req;
@@ -39,6 +39,11 @@ exports.getUser = (async (req, res) => {
     const studio = studioSnapshot.data()
 
     user.studioName = studio.name;
+
+    if (user.isAdmin === true) {
+        user.studioCode = studio.code;
+        user.studioAdminCode = studio.adminCode;
+    }
 
     return res.status(200).send(user).end()
 })
