@@ -15,15 +15,7 @@ exports.createStudio = (async (req, res) => {
     var user = userSnapshot.data()
     
     if (userSnapshot.exists && user.studioId !== null) {
-        const studioSnapshot = await Firebase.studio_store.doc(user.studioId).get()
-        const studio = studioSnapshot.data()
-
-        if (user.isAdmin !== true) {
-            studio.code = null
-            studio.adminCode = null
-        }
-
-        return res.status(200).send(studio)
+        return await this.getStudio(req, res);
     }
 
     return res.status(400).send()
