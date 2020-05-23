@@ -1,14 +1,6 @@
-/*
- {
-     "code": String,
-     "adminCode": String,
-     "id": String,
-     "name": String
- }
-*/
-
 const Firebase = require("../services/firebase")
 const userController = require("./UserController")
+const randomstring = require("randomstring")
 
 exports.createStudio = (async (req, res) => {
     var userSnapshot = await Firebase.users_store.doc(req.userId).get()
@@ -18,18 +10,33 @@ exports.createStudio = (async (req, res) => {
         return await this.getStudio(req, res);
     }
 
-    return res.status(400).send()
+    const { userName, studioName } = req.body
 
-    // const { userName, studioName } = req.body
+    if (!userName || !studioName) {
+        return res.status(400).send().end()
+    }
 
-    // if (!userName || !studioName) {
-    //     return res.status(400).send().end()
-    // }
+    const ref = Firebase.studio_store.doc()
+    const studio = {
+        id: ref.id,
+        code: randomstring.generate(12), // todo: make sure no other studio has this code
+        adminCode: randomstring.generate(12),
+        name: studioName
+    }
 
-    // req.body.name = userName
-    // req.body.studioCode = ""
-    // await userController.createStudio(req, res)
-    
+    await Firebase.studio_store.doc(studio.id).set(studio)
+
+    req.body.name = userName
+    req.body.studioCode = studio.code
+    await userController.createUser(req, res)
+
+    userSnapshot = await Firebase.users_store.doc(req.userId).get()
+    user = userSnapshot.data()
+
+    user.isAdmin = true
+    await Firebase.users_store.doc(user.id).set(user)
+
+    return res.status(201).send().end()
 })
 
 exports.getStudio = (async (req, res) => {
