@@ -6,13 +6,7 @@ exports.validUser = (async (req, res) => {
     return res.status(req.user ? 200 : 403).send()
 })
 
-exports.createUser = async (req, res) => {
-    const { name, studioCode } = req.body
-
-    if (!studioCode || !name) {
-        return res.status(400).send().end()
-    }
-
+exports.createUserHelper = async (userId, name, studioCode, isAdmin, res, shouldSend) => {
     const snapshot = await Firebase.studio_store.where("code", "==", studioCode).get()
     if (snapshot.size === 1) {
         var studio = snapshot.docs[0].data()
@@ -20,16 +14,27 @@ exports.createUser = async (req, res) => {
         const user = {
             name: name,
             studioId: studio.id,
-            id: req.userId
+            id: userId,
+            isAdmin: isAdmin
         }
         
-        await Firebase.users_store.doc(req.userId).set(user)
+        await Firebase.users_store.doc(userId).set(user)
         
         user.studioName = studio.name;
-        return res.status(201).send(user).end()
+        return shouldSend ? res.status(201).send(user).end() : true
     } else {
-        return res.status(403).send().end()
+        return shouldSend ? res.status(403).send().end() : false
     }
+}
+
+exports.createUser = async (req, res) => {
+    const { name, studioCode } = req.body
+
+    if (!studioCode || !name) {
+        return res.status(400).send().end()
+    }
+
+    return this.createUserHelper(req.userId, name, studioCode, false, res, true);
 }
 
 exports.getUser = (async (req, res) => {

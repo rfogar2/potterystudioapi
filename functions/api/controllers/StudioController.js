@@ -19,24 +19,17 @@ exports.createStudio = (async (req, res) => {
     const ref = Firebase.studio_store.doc()
     const studio = {
         id: ref.id,
-        code: randomstring.generate(12), // todo: make sure no other studio has this code
-        adminCode: randomstring.generate(12),
+        code: randomstring.generate(8), // todo: make sure no other studio has this code
+        adminCode: randomstring.generate(8),
         name: studioName
     }
 
     await Firebase.studio_store.doc(studio.id).set(studio)
+    const success = await userController.createUserHelper(req.userId, userName, studio.code, true, res, false)
 
-    req.body.name = userName
-    req.body.studioCode = studio.code
-    await userController.createUser(req, res)
+    // todo: if exception or success === false, delete studio created
 
-    userSnapshot = await Firebase.users_store.doc(req.userId).get()
-    user = userSnapshot.data()
-
-    user.isAdmin = true
-    await Firebase.users_store.doc(user.id).set(user)
-
-    return res.status(201).send().end()
+    return res.status(success ? 201 : 400).send().end()
 })
 
 exports.getStudio = (async (req, res) => {
