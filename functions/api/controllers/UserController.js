@@ -54,6 +54,18 @@ exports.getUser = (async (req, res) => {
     return res.status(200).send(user).end()
 })
 
+exports.presentUsers = (async (req, res) => {
+    const { user } = req;
+
+    const snapshot = await Firebase.users_store.where("studioId", "==", user.studioId).get()
+    const presentUsers = snapshot.docs
+        .map((doc) => doc.data())
+        .filter((user) => user.isPresent === true)
+        .sort((a, b) => a.name.localeCompare(b.name))
+
+    return res.status(200).send(presentUsers).end()
+})
+
 exports.deleteUser = (async (req, res) => {
     const { user } = req;
 
