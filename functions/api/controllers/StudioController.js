@@ -10,7 +10,7 @@ exports.createStudio = (async (req, res) => {
         return await this.getStudio(req, res);
     }
 
-    const { userName, studioName } = req.body
+    const { userName, studioName, profileImageUrl } = req.body
 
     if (!userName || !studioName) {
         return res.status(400).send().end()
@@ -25,7 +25,7 @@ exports.createStudio = (async (req, res) => {
     }
 
     await Firebase.studio_store.doc(studio.id).set(studio)
-    const success = await userController.createUserHelper(req.userId, userName, studio.code, true, res, false)
+    const success = await userController.createUserHelper(req.userId, userName, studio.code, true, res, false, profileImageUrl)
 
     // todo: if exception or success === false, delete studio created
 
