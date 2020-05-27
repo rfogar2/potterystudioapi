@@ -142,17 +142,13 @@ exports.getOpening = (async (req, res) => {
         return res.status(403).send()
     }
 
-    if (req.isAdmin) {
-        const usersSnapshot = await Firebase.users_store.get()
-        const reservedUsers = usersSnapshot.docs
-            .map((doc) => doc.data())
-            .filter((reservedUser) => opening.reservedUserIds.includes(reservedUser.id))
-            .sort((a, b) => a.name - b.name)
+    const usersSnapshot = await Firebase.users_store.get()
+    const reservedUsers = usersSnapshot.docs
+        .map((doc) => doc.data())
+        .filter((reservedUser) => opening.reservedUserIds.includes(reservedUser.id))
+        .sort((a, b) => a.name - b.name)
 
-        opening["reservedUsers"] = reservedUsers
-    } else {
-        opening["reservedUsers"] = []
-    }
+    opening["reservedUsers"] = reservedUsers
 
     return res.status(200).send(opening)
 })
