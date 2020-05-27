@@ -18,6 +18,10 @@ module.exports = (app) => {
 
     app.route("/user/present")
         .get(userController.presentUsers)
+        .put(userController.setAsPresent)
+
+    app.route("/user/absent")
+        .put(userController.setAsAbsent)
 
     app.route("/user/admin")
         .put(userController.registerAsAdmin)

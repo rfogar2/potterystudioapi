@@ -66,6 +66,24 @@ exports.presentUsers = (async (req, res) => {
     return res.status(200).send(presentUsers).end()
 })
 
+exports.setAsPresent = async (req, res) => {
+    const { user } = req;
+
+    user.isPresent = true;
+    await Firebase.users_store.doc(user.id).set(user);
+
+    return res.status(200).send(user).end();
+}
+
+exports.setAsAbsent = async (req, res) => {
+    const { user } = req;
+
+    user.isPresent = false;
+    await Firebase.users_store.doc(user.id).set(user);
+
+    return res.status(200).send(user).end();
+}
+
 exports.deleteUser = (async (req, res) => {
     const { user } = req;
 
