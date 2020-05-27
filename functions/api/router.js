@@ -14,6 +14,7 @@ module.exports = (app) => {
         .post(userController.createUser)
         .get(userController.getUser)
         .delete(userController.deleteUser)
+        .put(userController.updateUser)
 
     app.route("/user/present")
         .get(userController.presentUsers)

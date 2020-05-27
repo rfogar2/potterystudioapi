@@ -115,3 +115,19 @@ exports.registerAsAdmin = (async (req, res) => {
         return res.status(400).send()
     }
 })
+
+exports.updateUser = async (req, res) => {
+    const { user } = req;
+    const { name, profileImageUrl } = req.body
+
+    user.name = name || user.name
+
+    if (profileImageUrl === "") {
+        user.profileImageUrl = null
+    } else {
+        user.profileImageUrl = profileImageUrl || user.profileImageUrl
+    }
+
+    await Firebase.users_store.doc(user.id).set(user)
+    return res.status(200).send(user).end()
+}
