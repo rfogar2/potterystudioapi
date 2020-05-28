@@ -147,5 +147,16 @@ exports.updateUser = async (req, res) => {
     }
 
     await Firebase.users_store.doc(user.id).set(user)
+
+    const studioSnapshot = await Firebase.studio_store.doc(user.studioId).get()
+    const studio = studioSnapshot.data()
+
+    user.studioName = studio.name;
+
+    if (user.isAdmin === true) {
+        user.studioCode = studio.code;
+        user.studioAdminCode = studio.adminCode;
+    }
+
     return res.status(200).send(user).end()
 }
