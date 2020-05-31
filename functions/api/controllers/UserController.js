@@ -101,6 +101,7 @@ exports.deleteUser = (async (req, res) => {
 
     await batch.commit()
     await Firebase.users_store.doc(user.id).delete()
+    await Firebase.admin.auth().deleteUser(user.id)
 
     return res.status(204).send()
 })
