@@ -45,3 +45,20 @@ exports.getStudio = (async (req, res) => {
 
     return res.status(200).send(studio).end()
 })
+
+exports.updateBanner = async (req, res) => {
+    const { user } = req;
+
+    if (!user.isAdmin) {
+        return res.status(403).send().end()
+    }
+
+    const studioSnapshot = await Firebase.studio_store.doc(user.studioId).get()
+    const studio = studioSnapshot.data()
+
+    studio.banner = req.body.banner
+
+    await Firebase.studio_store.doc(studio.id).set(studio)
+
+    return res.status(200).send(studio).end()
+}

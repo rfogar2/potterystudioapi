@@ -57,4 +57,7 @@ module.exports = (app) => {
 
     app.route("/studio")
         .post(studioController.createStudio)
+
+    app.route("/studio/banner")
+        .put(studioController.updateBanner)
 }

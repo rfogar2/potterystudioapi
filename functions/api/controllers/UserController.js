@@ -21,7 +21,8 @@ exports.createUserHelper = async (userId, name, studioCode, isAdmin, res, should
         
         await Firebase.users_store.doc(userId).set(user)
         
-        user.studioName = studio.name;
+        user.studioName = studio.name
+        user.studioBanner = studio.banner
         return shouldSend ? res.status(201).send(user).end() : true
     } else {
         return shouldSend ? res.status(403).send().end() : false
@@ -35,27 +36,28 @@ exports.createUser = async (req, res) => {
         return res.status(400).send().end()
     }
 
-    return this.createUserHelper(req.userId, name, studioCode, false, res, true, profileImageUrl);
+    return this.createUserHelper(req.userId, name, studioCode, false, res, true, profileImageUrl)
 }
 
 exports.getUser = (async (req, res) => {
-    const { user } = req;
+    const { user } = req
 
     const studioSnapshot = await Firebase.studio_store.doc(user.studioId).get()
     const studio = studioSnapshot.data()
 
-    user.studioName = studio.name;
+    user.studioName = studio.name
+    user.studioBanner = studio.banner
 
     if (user.isAdmin === true) {
-        user.studioCode = studio.code;
-        user.studioAdminCode = studio.adminCode;
+        user.studioCode = studio.code
+        user.studioAdminCode = studio.adminCode
     }
 
     return res.status(200).send(user).end()
 })
 
 exports.presentUsers = (async (req, res) => {
-    const { user } = req;
+    const { user } = req
 
     const snapshot = await Firebase.users_store.where("studioId", "==", user.studioId).get()
     const presentUsers = snapshot.docs
@@ -67,25 +69,25 @@ exports.presentUsers = (async (req, res) => {
 })
 
 exports.setAsPresent = async (req, res) => {
-    const { user } = req;
+    const { user } = req
 
-    user.isPresent = true;
-    await Firebase.users_store.doc(user.id).set(user);
+    user.isPresent = true
+    await Firebase.users_store.doc(user.id).set(user)
 
-    return res.status(200).send(user).end();
+    return res.status(200).send().end()
 }
 
 exports.setAsAbsent = async (req, res) => {
-    const { user } = req;
+    const { user } = req
 
-    user.isPresent = false;
-    await Firebase.users_store.doc(user.id).set(user);
+    user.isPresent = false
+    await Firebase.users_store.doc(user.id).set(user)
 
-    return res.status(200).send(user).end();
+    return res.status(200).send().end()
 }
 
 exports.deleteUser = (async (req, res) => {
-    const { user } = req;
+    const { user } = req
 
     const snapshot = await Firebase.openings_store.where("studioId", "==", user.studioId).get()
     const openings = snapshot.docs.map((doc) => doc.data())
@@ -111,11 +113,11 @@ decryptSecret = (encrypted) => {
 
     const key = new NodeRSA(Buffer.from(privateKey))
     key.setOptions({encryptionScheme: "pkcs1"})
-    return key.decrypt(encrypted, "utf8");
+    return key.decrypt(encrypted, "utf8")
 }
 
 exports.registerAsAdmin = (async (req, res) => {
-    const { user } = req;
+    const { user } = req
     const { adminCode } = req.body
 
     if (user.isAdmin === true) {
@@ -126,7 +128,7 @@ exports.registerAsAdmin = (async (req, res) => {
     const studio = studioSnapshot.data()
 
     if (studio.adminCode === adminCode) {
-        user.isAdmin = true;
+        user.isAdmin = true
         await Firebase.users_store.doc(user.id).set(user)
 
         return res.status(200).send()
@@ -136,7 +138,7 @@ exports.registerAsAdmin = (async (req, res) => {
 })
 
 exports.updateUser = async (req, res) => {
-    const { user } = req;
+    const { user } = req
     const { name, profileImageUrl } = req.body
 
     user.name = name || user.name
@@ -152,11 +154,12 @@ exports.updateUser = async (req, res) => {
     const studioSnapshot = await Firebase.studio_store.doc(user.studioId).get()
     const studio = studioSnapshot.data()
 
-    user.studioName = studio.name;
+    user.studioName = studio.name
+    user.studioBanner = studio.banner
 
     if (user.isAdmin === true) {
-        user.studioCode = studio.code;
-        user.studioAdminCode = studio.adminCode;
+        user.studioCode = studio.code
+        user.studioAdminCode = studio.adminCode
     }
 
     return res.status(200).send(user).end()
