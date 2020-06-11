@@ -42,6 +42,10 @@ exports.createUser = async (req, res) => {
 exports.getUser = (async (req, res) => {
     const { user } = req
 
+    if (user === null) {
+        return res.status(403).send().end()
+    }
+
     const studioSnapshot = await Firebase.studio_store.doc(user.studioId).get()
     const studio = studioSnapshot.data()
 
