@@ -42,7 +42,8 @@ exports.createUser = async (req, res) => {
 exports.getUser = (async (req, res) => {
     const { user } = req
 
-    if (user === null) {
+    if (!user) {
+        console.log("GetUser Error: User not provided")
         return res.status(403).send().end()
     }
 
