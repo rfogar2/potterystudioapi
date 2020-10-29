@@ -150,8 +150,8 @@ exports.updateUser = async (req, res) => {
 
     if (profileImageUrl === "") {
         user.profileImageUrl = null
-    } else {
-        user.profileImageUrl = profileImageUrl || user.profileImageUrl
+    } else if (profileImageUrl !== null) {
+        user.profileImageUrl = profileImageUrl
     }
 
     await Firebase.users_store.doc(user.id).set(user)
